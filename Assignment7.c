@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 
 // A struct for the node of BST
 struct node
@@ -214,58 +215,43 @@ void insert(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
 
 // "Helps" delete a node, hence the name Delete-Utility.
 // (Keeps track for the recursion of replacements happening)
-bool deleteUtil(struct bin_search_tree *tree_ptr,struct node *curr_node)
+struct node* deleteUtil(struct node *left_node,struct node *right_node)
 {
-	bool deleted = false;
-
-	// If the node couldn't be found
-	if(!(curr_node))
+	int left_prob,right_prob,total;
+	if(!left_node)
 	{
-		return deleted;
+		left_prob = 0;
 	}
 	else
 	{
-		
-		// Case 1: (Predecessor / Left Child) does NOT exist
-		if( !(curr_node->left_child) )
-		{
-			if(!(curr_node->parent))
-			{
-				tree_ptr->root == curr_node->right_child;
-				if(curr_node->right_child)
-				curr_node->right_child->parent == curr_node->parent;
-			}
-			else if((curr_node->parent->key) > curr_node->key)
-			{
-				curr_node->parent->left_child = curr_node->right_child;
-				if(curr_node->right_child)
-				curr_node->right_child->parent == curr_node->parent;
-			}
-			else if((curr_node->parent->key) < curr_node->key)
-			{
-				curr_node->parent->right_child = curr_node->right_child;
-				if(curr_node->right_child)
-				curr_node->right_child->parent == curr_node->parent;
-			}
-			free(curr_node);
-			tree_ptr->num_nodes -= 1;
-			deleted = true;
-		}
-
-		// Case 2: (Predecessor / Left Child) exists
-		else
-		{
-			struct node* replace_node = curr_node->left_child;
-			while(replace_node->right_child)
-			{
-				replace_node = replace_node->right_child; 
-			}
-			int temp_key = replace_node->key;
-			deleted = deleteUtil(tree_ptr, replace_node);
-			curr_node->key = temp_key;
-		}
+		left_prob = (left_node->left_num) + (left_node->right_num) + 1;
 	}
-	return deleted;
+	if(!right_node)
+	{
+		right_prob = 0;
+	}
+	else
+	{
+		right_prob = (right_node->left_num) + (right_node->right_num) + 1;
+	}
+	total = left_prob + right_prob;
+	if (total == 0)
+	{
+		return NULL;
+	}
+	ran_num = rand()%total;
+	if(ran_num < left_prob)
+	{
+		left_node->right_child = deleteUtil(left_node->right_child,right_node);
+		left_node->right_child->parent = left_node;
+		return left_node;
+	}
+	else
+	{
+		right_node->left_child = deleteUtil(left_node,right_node->left_child);
+		right_node->left_child->parent = right_node;
+		return right_node;
+	}
 }
 
 // The base delete-a-node function.
