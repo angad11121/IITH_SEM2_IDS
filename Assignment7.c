@@ -12,6 +12,9 @@ struct node
 	struct node *parent;
 	struct node *left_child;
 	struct node *right_child;
+
+	int left_num;
+	int right_num;
 };
 
 
@@ -77,6 +80,21 @@ struct node* search(struct bin_search_tree *tree_ptr, int key)
 
 	// NULL means the node couldn't be found.
 	return curr_node;
+}
+
+// Supplementary function to count a node and it meta-children below
+int count_sub_nodes(struct node *curr_node)
+{
+	// Simple recursion
+
+	// Base Case
+	if(!curr_node)
+	{
+		return 0;
+	}
+	curr_node->left_num = count_sub_nodes(curr_node->left_child);
+	curr_node->right_num = count_sub_nodes(curr_node->right_child);
+	return ((curr_node->left_num)+(curr_node->right_num)+1);
 }
 
 
@@ -165,6 +183,7 @@ void insert(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
 			}
 		}
 		
+		count_sub_nodes(tree_ptr->root);
 		fprintf(output_file,"true\n");
 	}
 
@@ -262,6 +281,7 @@ void delete(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
 		// If deleted.
 		if(deleteUtil(tree_ptr, curr_node))
 		{
+			count_sub_nodes(tree_ptr->root);
 			fprintf(output_file,"true\n");
 			return;
 		}
@@ -413,20 +433,6 @@ void find(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
 
 	fprintf(output_file,"true, depth=%d\n", depth);
 	return;
-}
-
-// Supplementary function to count a node and it meta-children below
-int count_sub_nodes(struct node *curr_node)
-{
-	// Simple recursion
-
-	// Base Case
-	if(!curr_node)
-	{
-		return 0;
-	}
-
-	return (count_sub_nodes(curr_node->left_child)+count_sub_nodes(curr_node->right_child)+1);
 }
 
 // Function to calculate the imbalance of sub-tree
