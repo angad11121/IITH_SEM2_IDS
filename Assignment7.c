@@ -239,17 +239,19 @@ struct node* deleteUtil(struct node *left_node,struct node *right_node)
 	{
 		return NULL;
 	}
-	ran_num = rand()%total;
+	int ran_num = rand()%total;
 	if(ran_num < left_prob)
 	{
 		left_node->right_child = deleteUtil(left_node->right_child,right_node);
-		left_node->right_child->parent = left_node;
+		if(left_node->right_child)
+			left_node->right_child->parent = left_node;
 		return left_node;
 	}
 	else
 	{
 		right_node->left_child = deleteUtil(left_node,right_node->left_child);
-		right_node->left_child->parent = right_node;
+		if(right_node->left_child)
+			right_node->left_child->parent = right_node;
 		return right_node;
 	}
 }
@@ -264,13 +266,34 @@ void delete(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
 	// If found.
 	if(curr_node)
 	{
-		// If deleted.
-		if(deleteUtil(tree_ptr, curr_node))
+		struct node *replace_node = deleteUtil(curr_node->left_child,curr_node->right_child);
+		if(curr_node->parent)
 		{
-			count_sub_nodes(tree_ptr->root);
-			fprintf(output_file,"true\n");
-			return;
+			if(replace_node)
+			replace_node->parent = curr_node->parent;
+			
+			if(curr_node->parent->key > key)
+			{
+				curr_node->parent->left_child = replace_node; 
+			}
+			else if(curr_node->parent->key < key)
+			{
+				curr_node->parent->right_child = replace_node; 
+			}
 		}
+		else
+		{
+			if(replace_node)
+				replace_node->parent = NULL;
+			tree_ptr->root = replace_node;
+		}
+
+		free(curr_node);
+		tree_ptr->num_nodes -=1;
+		count_sub_nodes(tree_ptr->root);
+		fprintf(output_file,"true\n");
+		return;
+		
 	}
 	fprintf(output_file,"false\n");
 	return;
@@ -444,6 +467,7 @@ void calculate_imbalance(struct bin_search_tree *tree_ptr,int key, FILE *output_
 // The main function.
 int main()
 {
+	srand(time(NULL));
 	// Initialisation of struct values.
 	tree.num_nodes=0;
 	tree.root = NULL;
