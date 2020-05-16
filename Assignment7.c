@@ -101,7 +101,48 @@ int count_sub_nodes(struct node *curr_node)
 
 // Inserts a node in the tree.
 void insert(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
-{
+{	
+	if (search(tree_ptr,key))
+	{
+		fprintf(output_file,"false\n");
+		return; 
+	}
+
+	if(tree_ptr->num_nodes < 1)
+	{
+		struct node *newnode = (struct node *) malloc(sizeof(struct node));
+		if (newnode == NULL)
+		{
+			printf("Memory allocation fail.\n");
+			fprintf(output_file,"false\n");
+		   	return; 
+		}
+
+		// Update the struct node values
+		tree_ptr->root = newnode;
+		newnode->key = key;
+		newnode->left_child = NULL;
+		newnode->right_child =NULL;
+		newnode->parent = NULL;
+		count_sub_nodes(newnode);
+
+		// Update the tree values
+		tree_ptr->num_nodes += 1;
+		fprintf(output_file,"true\n");
+		return;
+	}
+	
+	int root_prob = tree_ptr->num_nodes;
+
+
+
+
+
+	// 
+	// 
+	// 
+
+/* hello
 	bool added = false;
 	if(tree_ptr->num_nodes > 0)
 	{	
@@ -211,6 +252,7 @@ void insert(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
 		tree_ptr->num_nodes += 1;
 		fprintf(output_file,"true\n");
 	}
+*/
 }
 
 // "Helps" delete a node, hence the name Delete-Utility.
