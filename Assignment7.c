@@ -98,6 +98,8 @@ int count_sub_nodes(struct node *curr_node)
 	return ((curr_node->left_num)+(curr_node->right_num)+1);
 }
 
+// "Helps" insert a node, hence the name Insert-Utility.
+// Split Function as described in the assignment pdf
 void insertUtil(int key, struct node *prev_parent, struct node *curr_node)
 {
 	if(!curr_node)
@@ -159,12 +161,14 @@ void insertUtil(int key, struct node *prev_parent, struct node *curr_node)
 // Inserts a node in the tree.
 void insert(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
 {	
+	// False if the node already exists.
 	if (search(tree_ptr,key))
 	{
 		fprintf(output_file,"false\n");
 		return; 
 	}
 
+	// Condition of no nodes
 	if(tree_ptr->num_nodes < 1)
 	{
 		struct node *newnode = (struct node *) malloc(sizeof(struct node));
@@ -188,153 +192,89 @@ void insert(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
 		fprintf(output_file,"true\n");
 		return;
 	}
+
+	// If nodes are present.
 	struct node *curr_node = tree_ptr->root;
 	bool added = false;
 	while(!added)
 	{
-		if(curr_node)
-		{
-			int root_prob = (curr_node->left_num)+(curr_node->right_num)+1;
-			int ran_num = rand()%root_prob;
-			if(ran_num == 0)
-			{
-				struct node *newnode = (struct node *) malloc(sizeof(struct node));
-				if (newnode == NULL)
-				{
-					printf("Memory allocation fail.\n");
-					fprintf(output_file,"false\n");
-				   	return; 
-				}
-				if(curr_node->parent)
-				{
-					newnode->parent = curr_node->parent;
-					if ((curr_node->parent->key) > key)
-					{
-						curr_node->parent->left_child = newnode;
-					}
-					else if ((curr_node->parent->key) < key)
-					{
-						curr_node->parent->right_child = newnode;
-					}
+		// Probability calculation
+		int root_prob = (curr_node->left_num)+(curr_node->right_num)+1;
+		int ran_num = rand()%root_prob;
 
-				}
-				else
-				{
-					newnode->parent = NULL;
-					tree_ptr->root = newnode;
-				}
-				newnode->key = key;
-				if((curr_node->key) > key)
-				{
-					newnode->right_child = curr_node;
-				}
-				else if((curr_node->key) < key)
-				{
-					newnode->left_child = curr_node;
-				}
-				curr_node->parent = newnode;
-				insertUtil(key,newnode,curr_node);
-				count_sub_nodes(tree_ptr->root);
-				tree_ptr->num_nodes += 1;
-				added = true;
-				fprintf(output_file,"true\n");
-				return;
+
+		// Insert at root Method.
+		if(ran_num == 0)
+		{
+			struct node *newnode = (struct node *) malloc(sizeof(struct node));
+			// Malloc Fail check.
+			if (newnode == NULL)
+			{
+				printf("Memory allocation fail.\n");
+				fprintf(output_file,"false\n");
+			   	return; 
 			}
+
+			/*
+			Updating Links
+			*/ 
+
+			// Link to and from the parent
+			if(curr_node->parent)
+			{
+				newnode->parent = curr_node->parent;
+				if ((curr_node->parent->key) > key)
+				{
+					curr_node->parent->left_child = newnode;
+				}
+				else if ((curr_node->parent->key) < key)
+				{
+					curr_node->parent->right_child = newnode;
+				}
+			}
+			// Link to/from root.
 			else
 			{
-				if((curr_node->key) > key)
-				{
-					if(curr_node->left_child)
-					{
-						curr_node = curr_node->left_child;
-						continue;
-					}
-					// addtion spot
-					else
-					{
-						struct node *newnode = (struct node *) malloc(sizeof(struct node));
-						if (newnode == NULL)
-						{
-							printf("Memory allocation fail.\n");
-							fprintf(output_file,"false\n");
-					    	return; 
-						}
-
-						// Update the struct node values
-						curr_node->left_child = newnode;
-						newnode->key = key;
-						newnode->left_child = NULL;
-						newnode->right_child =NULL;
-						newnode->parent = curr_node;
-						count_sub_nodes(tree_ptr->root);
-
-						added = true;
-						
-						// Update the tree values
-						tree_ptr->num_nodes += 1;
-						break;
-					}
-				}
-				else if((curr_node->key) < key)
-				{
-					if(curr_node->right_child)
-					{
-						curr_node = curr_node->right_child;
-						continue;
-					}
-
-					// addtion spot
-					else
-					{
-						struct node *newnode = (struct node *) malloc(sizeof(struct node));
-						if (newnode == NULL)
-						{
-							printf("Memory allocation fail.\n");
-							fprintf(output_file,"false\n");
-					    	return; 
-						}
-
-						// Update the struct node values
-						curr_node->right_child = newnode;
-						newnode->key = key;
-						newnode->left_child = NULL;
-						newnode->right_child =NULL;
-						newnode->parent = curr_node;
-						count_sub_nodes(tree_ptr->root);
-					
-						added = true;
-
-						// Update the tree values
-						tree_ptr->num_nodes += 1;
-						break;
-					}
-				}	
+				newnode->parent = NULL;
+				tree_ptr->root = newnode;
 			}
-		}	
-	}
 
-	fprintf(output_file,"true\n");
-	return;
-
-	// 
-	// 
-	// 
-
-/* hello
-	bool added = false;
-	if(tree_ptr->num_nodes > 0)
-	{	
-		// Initialising the searcher node
-		struct node *curr_node = tree_ptr->root;
-	
-		// logic to find the coorect place to add.
-		while(!added){
-			if((curr_node->key) == key) 
+			// Updating the key.
+			newnode->key = key;
+			
+			// Link to the child
+			if((curr_node->key) > key)
 			{
-				fprintf(output_file,"false\n");
-				return;
+				newnode->right_child = curr_node;
 			}
-			else if((curr_node->key) > key)
+			else if((curr_node->key) < key)
+			{
+				newnode->left_child = curr_node;
+			}
+
+			// Link from the child
+			curr_node->parent = newnode;
+
+			// Split function
+			insertUtil(key,newnode,curr_node);
+
+			// Updation of node values.
+			count_sub_nodes(tree_ptr->root);
+
+			// Updating tree values.
+			tree_ptr->num_nodes += 1;
+			added = true;
+			fprintf(output_file,"true\n");
+			return;
+		}
+
+		// The regular insert method. 
+		else
+		{
+			// Iteration to left and right child.
+
+			// To Left.
+			if((curr_node->key) > key)
 			{
 				if(curr_node->left_child)
 				{
@@ -345,6 +285,7 @@ void insert(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
 				else
 				{
 					struct node *newnode = (struct node *) malloc(sizeof(struct node));
+					// Malloc Fail Check.
 					if (newnode == NULL)
 					{
 						printf("Memory allocation fail.\n");
@@ -358,15 +299,16 @@ void insert(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
 					newnode->left_child = NULL;
 					newnode->right_child =NULL;
 					newnode->parent = curr_node;
+					count_sub_nodes(tree_ptr->root);
 
 					added = true;
-					
+						
 					// Update the tree values
 					tree_ptr->num_nodes += 1;
 					break;
 				}
-
 			}
+			// To Right.
 			else if((curr_node->key) < key)
 			{
 				if(curr_node->right_child)
@@ -379,6 +321,7 @@ void insert(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
 				else
 				{
 					struct node *newnode = (struct node *) malloc(sizeof(struct node));
+					// Malloc Fail Check.
 					if (newnode == NULL)
 					{
 						printf("Memory allocation fail.\n");
@@ -392,51 +335,28 @@ void insert(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
 					newnode->left_child = NULL;
 					newnode->right_child =NULL;
 					newnode->parent = curr_node;
-					
+					count_sub_nodes(tree_ptr->root);
+				
 					added = true;
 
 					// Update the tree values
 					tree_ptr->num_nodes += 1;
 					break;
 				}
-
-			}
+			}	
 		}
-		
-		count_sub_nodes(tree_ptr->root);
-		fprintf(output_file,"true\n");
+			
 	}
 
-	else
-	{
-		struct node *newnode = (struct node *) malloc(sizeof(struct node));
-		if (newnode == NULL)
-		{
-			printf("Memory allocation fail.\n");
-			fprintf(output_file,"false\n");
-		   	return; 
-		}
-
-		// Update the struct node values
-		tree_ptr->root = newnode;
-		newnode->key = key;
-		newnode->left_child = NULL;
-		newnode->right_child =NULL;
-		newnode->parent = NULL;
-		
-		added = true;
-
-		// Update the tree values
-		tree_ptr->num_nodes += 1;
-		fprintf(output_file,"true\n");
-	}
-*/
+	fprintf(output_file,"true\n");
+	return;
 }
 
 // "Helps" delete a node, hence the name Delete-Utility.
-// (Keeps track for the recursion of replacements happening)
+//  Works as the join function as described in the assignment
 struct node* deleteUtil(struct node *left_node,struct node *right_node)
 {
+	// Calculation of Probability.
 	int left_prob,right_prob,total;
 	if(!left_node)
 	{
@@ -459,6 +379,8 @@ struct node* deleteUtil(struct node *left_node,struct node *right_node)
 	{
 		return NULL;
 	}
+
+	// Random Number For Choosing the path of joining
 	int ran_num = rand()%total;
 	if(ran_num < left_prob)
 	{
@@ -489,6 +411,7 @@ void delete(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
 		struct node *replace_node = deleteUtil(curr_node->left_child,curr_node->right_child);
 		if(curr_node->parent)
 		{
+			// Placing the replace node on curr_node's place.
 			if(replace_node)
 			replace_node->parent = curr_node->parent;
 			
@@ -503,11 +426,13 @@ void delete(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
 		}
 		else
 		{
+			// Placing the replace node on curr_node's place.
 			if(replace_node)
 				replace_node->parent = NULL;
 			tree_ptr->root = replace_node;
 		}
 
+		// Deleting the memory of curr_node/ required node.
 		free(curr_node);
 		tree_ptr->num_nodes -=1;
 		count_sub_nodes(tree_ptr->root);
