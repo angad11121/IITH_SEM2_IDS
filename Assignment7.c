@@ -98,6 +98,63 @@ int count_sub_nodes(struct node *curr_node)
 	return ((curr_node->left_num)+(curr_node->right_num)+1);
 }
 
+void insertUtil(int key, struct node *prev_parent, struct node *curr_node)
+{
+	if(!curr_node)
+	{
+		return;
+	}
+	if(curr_node->key > key)
+	{
+		if( (!(curr_node->left_child)) || ((curr_node->left_child->key) < key) )
+		{
+			if((prev_parent->key) == key)
+			{
+				prev_parent->left_child = curr_node->left_child;
+			}
+			else
+			{
+				prev_parent->right_child = curr_node->left_child;
+			}
+			if(curr_node->left_child)
+				curr_node->left_child->parent = prev_parent;
+			struct node *temp = curr_node->left_child;
+			curr_node->left_child = NULL;
+			prev_parent = curr_node;
+			insertUtil(key, prev_parent, temp);
+		}
+		else
+		{
+			curr_node = curr_node->left_child;
+			insertUtil(key, prev_parent,curr_node);
+		}
+	}
+	else if(curr_node->key < key)
+	{
+		if( (!(curr_node->right_child)) || ((curr_node->right_child->key) > key) )
+		{
+			if((prev_parent->key) == key)
+			{
+				prev_parent->right_child = curr_node->right_child;
+			}
+			else
+			{
+				prev_parent->left_child = curr_node->right_child;
+			}
+			if(curr_node->right_child)
+				curr_node->right_child->parent = prev_parent;
+			struct node *temp = curr_node->right_child;
+			curr_node->right_child = NULL;
+			prev_parent = curr_node;
+			insertUtil(key, prev_parent, temp);
+		}
+		else
+		{
+			curr_node = curr_node->right_child;
+			insertUtil(key, prev_parent,curr_node);
+		}
+	}
+}
 
 // Inserts a node in the tree.
 void insert(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
@@ -131,10 +188,14 @@ void insert(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
 		fprintf(output_file,"true\n");
 		return;
 	}
-	
-	int root_prob = tree_ptr->num_nodes;
-
-
+	struct node *curr_node = tree_ptr->root;
+	bool added = false;
+	while(!added)
+	{
+		int root_prob = (curr_node->left_num)+(curr_node->right_num)+1;
+		int ran_num = rand()%root_prob;
+		if()
+	}
 
 
 
