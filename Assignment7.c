@@ -192,12 +192,129 @@ void insert(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
 	bool added = false;
 	while(!added)
 	{
-		int root_prob = (curr_node->left_num)+(curr_node->right_num)+1;
-		int ran_num = rand()%root_prob;
-		if()
+		if(curr_node)
+		{
+			int root_prob = (curr_node->left_num)+(curr_node->right_num)+1;
+			int ran_num = rand()%root_prob;
+			if(ran_num == 0)
+			{
+				struct node *newnode = (struct node *) malloc(sizeof(struct node));
+				if (newnode == NULL)
+				{
+					printf("Memory allocation fail.\n");
+					fprintf(output_file,"false\n");
+				   	return; 
+				}
+				if(curr_node->parent)
+				{
+					newnode->parent = curr_node->parent;
+					if ((curr_node->parent->key) > key)
+					{
+						curr_node->parent->left_child = newnode;
+					}
+					else if ((curr_node->parent->key) < key)
+					{
+						curr_node->parent->right_child = newnode;
+					}
+
+				}
+				else
+				{
+					newnode->parent = NULL;
+					tree_ptr->root = newnode;
+				}
+				newnode->key = key;
+				if((curr_node->key) > key)
+				{
+					newnode->right_child = curr_node;
+				}
+				else if((curr_node->key) < key)
+				{
+					newnode->left_child = curr_node;
+				}
+				curr_node->parent = newnode;
+				insertUtil(key,newnode,curr_node);
+				count_sub_nodes(tree_ptr->root);
+				tree_ptr->num_nodes += 1;
+				added = true;
+				fprintf(output_file,"true\n");
+				return;
+			}
+			else
+			{
+				if((curr_node->key) > key)
+				{
+					if(curr_node->left_child)
+					{
+						curr_node = curr_node->left_child;
+						continue;
+					}
+					// addtion spot
+					else
+					{
+						struct node *newnode = (struct node *) malloc(sizeof(struct node));
+						if (newnode == NULL)
+						{
+							printf("Memory allocation fail.\n");
+							fprintf(output_file,"false\n");
+					    	return; 
+						}
+
+						// Update the struct node values
+						curr_node->left_child = newnode;
+						newnode->key = key;
+						newnode->left_child = NULL;
+						newnode->right_child =NULL;
+						newnode->parent = curr_node;
+						count_sub_nodes(tree_ptr->root);
+
+						added = true;
+						
+						// Update the tree values
+						tree_ptr->num_nodes += 1;
+						break;
+					}
+				}
+				else if((curr_node->key) < key)
+				{
+					if(curr_node->right_child)
+					{
+						curr_node = curr_node->right_child;
+						continue;
+					}
+
+					// addtion spot
+					else
+					{
+						struct node *newnode = (struct node *) malloc(sizeof(struct node));
+						if (newnode == NULL)
+						{
+							printf("Memory allocation fail.\n");
+							fprintf(output_file,"false\n");
+					    	return; 
+						}
+
+						// Update the struct node values
+						curr_node->right_child = newnode;
+						newnode->key = key;
+						newnode->left_child = NULL;
+						newnode->right_child =NULL;
+						newnode->parent = curr_node;
+						count_sub_nodes(tree_ptr->root);
+					
+						added = true;
+
+						// Update the tree values
+						tree_ptr->num_nodes += 1;
+						break;
+					}
+				}	
+			}
+		}	
 	}
 
-
+	fprintf(output_file,"true\n");
+	return;
 
 	// 
 	// 
