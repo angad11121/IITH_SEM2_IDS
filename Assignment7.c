@@ -100,12 +100,24 @@ int count_sub_nodes(struct node *curr_node)
 
 // "Helps" insert a node, hence the name Insert-Utility.
 // Split Function as described in the assignment pdf
+/*
+	Method:
+	We know that left slicing(diagonally down) and
+	right slicing(diagonally up) will show up alternatively.
+	There is a previous parent pointer which had lost a child 
+	during previous split gets a new child from one of the 
+	children of that previously-split child.
+	This occurs recursively.
+
+*/
 void insertUtil(int key, struct node *prev_parent, struct node *curr_node)
 {
 	if(!curr_node)
 	{
 		return;
 	}
+
+	// A split to the left
 	if(curr_node->key > key)
 	{
 		if( (!(curr_node->left_child)) || ((curr_node->left_child->key) < key) )
@@ -125,12 +137,14 @@ void insertUtil(int key, struct node *prev_parent, struct node *curr_node)
 			prev_parent = curr_node;
 			insertUtil(key, prev_parent, temp);
 		}
+		// Iteration to the next child.
 		else
 		{
 			curr_node = curr_node->left_child;
 			insertUtil(key, prev_parent,curr_node);
 		}
 	}
+	// A split to the right
 	else if(curr_node->key < key)
 	{
 		if( (!(curr_node->right_child)) || ((curr_node->right_child->key) > key) )
@@ -150,6 +164,7 @@ void insertUtil(int key, struct node *prev_parent, struct node *curr_node)
 			prev_parent = curr_node;
 			insertUtil(key, prev_parent, temp);
 		}
+		// Iteration to the next child.
 		else
 		{
 			curr_node = curr_node->right_child;
@@ -159,12 +174,12 @@ void insertUtil(int key, struct node *prev_parent, struct node *curr_node)
 }
 
 // Inserts a node in the tree.
-void insert(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
+void insert(struct bin_search_tree *tree_ptr, int key)
 {	
 	// False if the node already exists.
 	if (search(tree_ptr,key))
 	{
-		fprintf(output_file,"false\n");
+		printf("false\n");
 		return; 
 	}
 
@@ -175,7 +190,7 @@ void insert(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
 		if (newnode == NULL)
 		{
 			printf("Memory allocation fail.\n");
-			fprintf(output_file,"false\n");
+			printf("false\n");
 		   	return; 
 		}
 
@@ -189,7 +204,7 @@ void insert(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
 
 		// Update the tree values
 		tree_ptr->num_nodes += 1;
-		fprintf(output_file,"true\n");
+		printf("true\n");
 		return;
 	}
 
@@ -211,7 +226,7 @@ void insert(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
 			if (newnode == NULL)
 			{
 				printf("Memory allocation fail.\n");
-				fprintf(output_file,"false\n");
+				printf("false\n");
 			   	return; 
 			}
 
@@ -264,7 +279,7 @@ void insert(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
 			// Updating tree values.
 			tree_ptr->num_nodes += 1;
 			added = true;
-			fprintf(output_file,"true\n");
+			printf("true\n");
 			return;
 		}
 
@@ -289,7 +304,7 @@ void insert(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
 					if (newnode == NULL)
 					{
 						printf("Memory allocation fail.\n");
-						fprintf(output_file,"false\n");
+						printf("false\n");
 				    	return; 
 					}
 
@@ -325,7 +340,7 @@ void insert(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
 					if (newnode == NULL)
 					{
 						printf("Memory allocation fail.\n");
-						fprintf(output_file,"false\n");
+						printf("false\n");
 				    	return; 
 					}
 
@@ -348,7 +363,7 @@ void insert(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
 			
 	}
 
-	fprintf(output_file,"true\n");
+	printf("true\n");
 	return;
 }
 
@@ -400,7 +415,7 @@ struct node* deleteUtil(struct node *left_node,struct node *right_node)
 
 // The base delete-a-node function.
 // [Uses deleteUtil() and search()]
-void delete(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
+void delete(struct bin_search_tree *tree_ptr, int key)
 {
 	// Finding the address of node to be deleted
 	struct node *curr_node = search(tree_ptr, key);
@@ -436,111 +451,111 @@ void delete(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
 		free(curr_node);
 		tree_ptr->num_nodes -=1;
 		count_sub_nodes(tree_ptr->root);
-		fprintf(output_file,"true\n");
+		printf("true\n");
 		return;
 		
 	}
-	fprintf(output_file,"false\n");
+	printf("false\n");
 	return;
 }
 
 // Supplementary Print function 1
-void print_inorder(struct bin_search_tree *tree_ptr,struct node *curr_node, FILE *output_file)
+void print_inorder(struct bin_search_tree *tree_ptr,struct node *curr_node)
 {
 	if(!curr_node)
 	{
 		return;
 	}
 
-	print_inorder(tree_ptr,curr_node->left_child,output_file);
+	print_inorder(tree_ptr,curr_node->left_child);
 
-	fprintf(output_file,"%d ",curr_node->key);
+	printf("%d ",curr_node->key);
 
-	print_inorder(tree_ptr,curr_node->right_child,output_file);
+	print_inorder(tree_ptr,curr_node->right_child);
 }
 
 // Supplementary Print function 2
-void print_preorder(struct bin_search_tree *tree_ptr,struct node *curr_node, FILE *output_file)
+void print_preorder(struct bin_search_tree *tree_ptr,struct node *curr_node)
 {
 	if(!curr_node)
 	{
 		return;
 	}
 
-	fprintf(output_file,"%d ",curr_node->key);
+	printf("%d ",curr_node->key);
 
-	print_preorder(tree_ptr,curr_node->left_child,output_file);
+	print_preorder(tree_ptr,curr_node->left_child);
 
-	print_preorder(tree_ptr,curr_node->right_child,output_file);
+	print_preorder(tree_ptr,curr_node->right_child);
 }
 
 // Supplementary Print function 3
-void print_postorder(struct bin_search_tree *tree_ptr,struct node *curr_node, FILE *output_file)
+void print_postorder(struct bin_search_tree *tree_ptr,struct node *curr_node)
 {
 	if(!curr_node)
 	{
 		return;
 	}
 
-	print_postorder(tree_ptr,curr_node->left_child,output_file);
+	print_postorder(tree_ptr,curr_node->left_child);
 
-	print_postorder(tree_ptr,curr_node->right_child,output_file);
+	print_postorder(tree_ptr,curr_node->right_child);
 
-	fprintf(output_file,"%d ",curr_node->key);
+	printf("%d ",curr_node->key);
 }
 
 // Print function for the user query
 // [Uses supplementary print functions]
-void print_subtree(struct bin_search_tree *tree_ptr,int key, FILE *output_file)
+void print_subtree(struct bin_search_tree *tree_ptr,int key)
 {
 	// Finding the root of sub-tree
 	struct node *curr_node = search(tree_ptr,key);
 	if(!curr_node)
 	{
-		fprintf(output_file,"false\n");
+		printf("false\n");
 		return;
 	}
 
 	// Print Format.
-	fprintf(output_file,"Inorder: ");
-	print_inorder(tree_ptr,curr_node,output_file);
-	fprintf(output_file,"\nPreorder: ");
-	print_preorder(tree_ptr,curr_node,output_file);
-	fprintf(output_file,"\nPostorder: ");
-	print_postorder(tree_ptr,curr_node,output_file);
-	fprintf(output_file,"\n");
+	printf("Inorder: ");
+	print_inorder(tree_ptr,curr_node);
+	printf("\nPreorder: ");
+	print_preorder(tree_ptr,curr_node);
+	printf("\nPostorder: ");
+	print_postorder(tree_ptr,curr_node);
+	printf("\n");
 }
 
 // Print function for the user query
 // [Uses supplementary print functions]
-void print_tree(struct bin_search_tree *tree_ptr, FILE *output_file)
+void print_tree(struct bin_search_tree *tree_ptr)
 {
 	struct node *curr_node = tree_ptr->root;
 	if(!curr_node)
 	{
-		fprintf(output_file,"false\n");
+		printf("false\n");
 		return;
 	}
 
 	// Print Format.
-	fprintf(output_file,"Inorder: ");
-	print_inorder(tree_ptr,curr_node,output_file);
-	fprintf(output_file,"\nPreorder: ");
-	print_preorder(tree_ptr,curr_node,output_file);
-	fprintf(output_file,"\nPostorder: ");
-	print_postorder(tree_ptr,curr_node,output_file);
-	fprintf(output_file,"\n");
+	printf("Inorder: ");
+	print_inorder(tree_ptr,curr_node);
+	printf("\nPreorder: ");
+	print_preorder(tree_ptr,curr_node);
+	printf("\nPostorder: ");
+	print_postorder(tree_ptr,curr_node);
+	printf("\n");
 }
 
 // Find a node and its prints its depth.
-void find(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
+void find(struct bin_search_tree *tree_ptr, int key)
 {
 	int depth = 0;
 
 	// No node check
 	if(tree_ptr->num_nodes<1)
 	{
-		fprintf(output_file,"false\n");
+		printf("false\n");
 		return;
 	}
 
@@ -564,7 +579,7 @@ void find(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
 			}
 			else
 			{
-				fprintf(output_file,"false\n");
+				printf("false\n");
 				return;
 			}
 		}
@@ -579,19 +594,19 @@ void find(struct bin_search_tree *tree_ptr, int key, FILE *output_file)
 			}
 			else
 			{
-				fprintf(output_file,"false\n");
+				printf("false\n");
 				return;
 			}
 		}
 	}
 
-	fprintf(output_file,"true, depth=%d\n", depth);
+	printf("true, depth=%d\n", depth);
 	return;
 }
 
 // Function to calculate the imbalance of sub-tree
 // [Uses the count function]
-void calculate_imbalance(struct bin_search_tree *tree_ptr,int key, FILE *output_file)
+void calculate_imbalance(struct bin_search_tree *tree_ptr,int key)
 {
 	// Search for the address of node.
 	struct node *curr_node = search(tree_ptr, key);
@@ -599,14 +614,14 @@ void calculate_imbalance(struct bin_search_tree *tree_ptr,int key, FILE *output_
 	// If not found.
 	if(!curr_node)
 	{
-		fprintf(output_file,"false\n");
+		printf("false\n");
 		return;
 	}
 
 	// Simple arithmetical logic.
 	int left = count_sub_nodes(curr_node->left_child);
 	int right = count_sub_nodes(curr_node->right_child);
-	fprintf(output_file,"%d\n", (left-right) );
+	printf("%d\n", (left-right) );
 }
 
 // The main function.
@@ -617,59 +632,47 @@ int main()
 	tree.num_nodes=0;
 	tree.root = NULL;
 
-	// File operations
-	FILE *input_file,*output_file;
-	if ((input_file=fopen("input.txt","r"))==NULL)
-	{
-		printf("Input file couldn't be found\n");
-		return 1;
-	}
-	output_file=fopen("output.txt","w+");
-
 	// Number of queries
 	int t;
-	fscanf(input_file,"%d",&t);
+	scanf("%d",&t);
 	while(t--)
 	{
 		// Query type
 		int q;
 		int key;
-		fscanf(input_file,"%d",&q);
+		scanf("%d",&q);
 		
 		// Conditional queries.
 		switch(q)
 		{
 			case 1:
-				fscanf(input_file,"%d",&key);
-				insert(&tree,key,output_file);
+				scanf("%d",&key);
+				insert(&tree,key);
 				break;
 			case 2:
-				fscanf(input_file,"%d",&key);
-				delete(&tree,key,output_file);
+				scanf("%d",&key);
+				delete(&tree,key);
 				break;
 			case 3:
-				fscanf(input_file,"%d",&key);
-				find(&tree,key,output_file);
+				scanf("%d",&key);
+				find(&tree,key);
 				break;
 			case 4:
-				print_tree(&tree,output_file);
+				print_tree(&tree);
 				break;
 			case 5:
-				fscanf(input_file,"%d",&key);
-				print_subtree(&tree,key,output_file);
+				scanf("%d",&key);
+				print_subtree(&tree,key);
 				break;
 			case 6:
-				fscanf(input_file,"%d",&key);
-				calculate_imbalance(&tree,key,output_file);
+				scanf("%d",&key);
+				calculate_imbalance(&tree,key);
 				break;
 			default:
-				fprintf(output_file,"false\n");
+				printf("false\n");
 				break;
 		}
 	}
 
-	// File operations
-	fclose(input_file);
-	fclose(output_file);
 	return 0;
 }
