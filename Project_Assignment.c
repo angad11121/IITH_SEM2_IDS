@@ -122,6 +122,17 @@ void dequeue(struct queue *event_queue)
 	}
 }
 
+struct l_node * l_find(int id, struct vertex *vtx)
+{
+	struct l_node *temp = vtx->adjacent;
+	if(!temp) return temp;
+	while(temp)
+	{
+		if((temp->id)== id) break;
+		temp = temp->next;
+	}
+	return temp;
+}
 void l_push(int id, struct vertex *vtx)
 {
 	// Memory Allocation to a node
@@ -173,10 +184,15 @@ void create_graph(int vertices, int edges)
 	}
 	for (int i = 0; i < edges; ++i)
 	{
-		int ran1 = rand()% (vertices+1);
-		int ran2 = rand()% (vertices+1);
+		int ran1 = rand()% (vertices);
+		int ran2 = rand()% (vertices);
 		if(ran1 != ran2)
 		{
+			if(l_find(ran1, &graph[ran2]))
+			{
+				i--;
+				continue;
+			}
 			l_push(ran1, &graph[ran2]);
 			l_push(ran2, &graph[ran1]);
 		}
@@ -198,7 +214,10 @@ void printgraph(int vertices)
 
 int main()
 {
-	create_graph(20, 50);
-	printgraph(20);
+	srand(time(NULL));
+	int num_nodes = 20;
+	// struct vertex graph[num_nodes];
+	create_graph(num_nodes, 2*num_nodes);
+	printgraph(num_nodes);
 	return 0;
 }
