@@ -7,8 +7,8 @@
 #define MAX_VERTICES 10000
 #define MAX_EDGES 3000
 #define DAYS 300
-#define TAU 0.5
-#define GAMMA 0.2
+#define TAU 0.4
+#define GAMMA 0.1
 
 
 // Some variables as global parameters for the simulation.
@@ -16,6 +16,7 @@ int curr_day = 0;
 int susceptible;
 int infected;
 int recovered;
+int max_q_len = 0;
 
 /*
 	Plague Inc. 
@@ -112,6 +113,10 @@ void enqueue(struct queue *event_queue, int id, int day, char action)
 	
 	// Updating Value for queue
 	event_queue->length +=1;
+	if((event_queue->length) > max_q_len)
+	{
+		max_q_len = event_queue->length;
+	}
 }
 
 // Function to remove event from the front of queue
@@ -293,6 +298,7 @@ void simulation(struct queue *event_queue, int vertices)
 	// Event Processing
 	while((event_queue->length) && curr_day < (DAYS+1))
 	{
+		// printf("id %d day%d action%c\n", event_queue->front->id, event_queue->front->day ,event_queue->front->action);
 		if((event_queue->front->day) > curr_day)
 		{
 			printf("%d,%d,%d,%d\n",curr_day,susceptible,infected,recovered);
@@ -323,5 +329,7 @@ int main()
 	int num_nodes = rand()%10000;
 	create_graph(num_nodes);
 	simulation(&events,num_nodes);
+
+	printf("\n\n%d\n", max_q_len);
 	return 0;
 }
