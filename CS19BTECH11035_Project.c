@@ -7,7 +7,7 @@
 #define MAX_VERTICES 10000
 #define MAX_EDGES 3000
 #define DAYS 300
-#define TAU 0.4
+#define TAU 0.5
 #define GAMMA 0.1
 #define CAPACITY 50000
 /*
