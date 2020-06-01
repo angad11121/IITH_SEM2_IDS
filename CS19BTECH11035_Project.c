@@ -10,11 +10,18 @@
 #define TAU 0.5
 #define GAMMA 0.2
 #define CAPACITY 50000
+
 /*
 	The event capacity was decided seeing the result of multiple
 	simulations. The Value never exceeded 30k (or 3 X Vertices in general) 
 	hence 50k (or 5 X Vertices) was assumed to be a safe 
 	upper bound 
+*/
+
+/*
+	Output format
+	<Day>,<Num of S>,<Num of I>,<Num of R>
+	Day Start from 1 till 300.
 */
 
 
