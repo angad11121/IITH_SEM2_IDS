@@ -8,7 +8,7 @@
 #define MAX_EDGES 3000
 #define DAYS 300
 #define TAU 0.5
-#define GAMMA 0.1
+#define GAMMA 0.2
 #define CAPACITY 50000
 /*
 	The event capacity was decided seeing the result of multiple
